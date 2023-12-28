@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="">
+<meta name="author" content="">
+<title>アイドレス4 イベント管理システム</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="./css/main.css">
+</head>
+<body>
+<div id="app">
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+<!-- navbar-inverse で黒系ナビゲーションの指定をしています。-->
+<!-- navbar-fixed-top でヘッダー固定の指定をしています。-->
+<div class="container">
+<div class="navbar-header">
+<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
+<!--button~はウインドウのサイズが780px以下になった時に表示されます。-->
+<a class="navbar-brand" href="#">iEMS</a>
+<!--こちらにサイト名を入れます。-->
+</div>
+<div class="collapse navbar-collapse">
+<ul class="nav navbar-nav">
+<li><router-link to="/top">Home</router-link></li>
+<li><router-link to="/add">イベント登録</router-link</li>
+</ul>
+</div>
+<!--/.nav-collapse -->
+</div>
+</div>
+<div id="body" class="container">
+  <router-view></router-view>
+</div>
+</div>
+
+<script type="text/x-template" id="top-page">
+  <table class="table">
+    <thead>
+      <tr><th>ターン</th><th>No.</th><th>内容</th><th>評価</th><th>締切</th></tr>
+    </thead>
+    <tbody>
+      <tr v-for="event in events">
+        <td>{{event.turn}}</td>
+        <td>{{event.sortKey}}</td>
+        <td><router-link :to='"event/"+event.sortKey'>{{event.title}}</router-link></td>
+        <td>{{event.power}}</td>
+        <td>{{event.expire}}</td>
+      </tr>
+    </tbody>
+  </table>
+</script>
+
+<script type="text/x-template" id="view-events">
+  <form>
+    <table class="table">
+      <thead>
+        <tr><th>ターン</th><th>No.</th><th>内容</th><th>評価</th><th>締切</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{event.turn}}</td>
+          <td>{{event.sortKey}}</td>
+          <td>{{event.title}}</td>
+          <td>{{event.power}}</td>
+          <td>{{event.expire}}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div v-if="event.comment">
+      <h4>コメント</h4>
+      <p style="white-space: pre;">{{event.comment}}</p>
+    </div>
+    <div v-if="event.mainIdress">
+      <h4>提出アイドレス</h4>
+      RD: {{event.real_data}}
+      <pre>{{event.mainIdress}}</pre>
+    </div>
+    <div v-if="event.illust">
+      <h4>イラスト</h4>
+      <a :href="event.illust">{{event.illust}}</a>
+    </div>
+    <div v-if="event.combo1">
+      <h4>コンボ1</h4>
+      <a :href="event.combo1">{{event.combo1}}</a>
+    </div>
+    <div v-if="event.combo2">
+      <h4>コンボ2</h4>
+      <a :href="event.combo2">{{event.combo2}}</a>
+    </div>
+    <div v-if="event.combo3">
+      <h4>コンボ3</h4>
+      <a :href="event.combo3">{{event.combo3}}</a>
+    </div>
+    <div v-if="event.combo4">
+      <h4>コンボ4</h4>
+      <a :href="event.combo4">{{event.combo4}}</a>
+    </div>
+    <div v-if="event.combo5">
+      <h4>コンボ5</h4>
+      <a :href="event.combo5">{{event.combo5}}</a>
+    </div>
+
+    <hr>
+
+    <div class="form-group">
+      <label for="exampleTextarea">名前</label>
+    <input type="text" class="form-control" id="name" placeholder="投稿者" v-model="name">
+    </div>
+    <div class="form-group">
+      <label for="exampleTextarea">コメント</label>
+      <textarea class="form-control" rows="3" placeholder="作戦・伝達事項等を記入してください。" v-model="comment"></textarea>
+    </div>
+    <div class="form-group">
+      <label for="exampleInputEmail1">提出アイドレス</label>
+      <textarea class="form-control" rows="6" placeholder="メインアイドレスの提出書式" v-model="mainIdress"></textarea>
+    </div>
+    <div class="form-group">
+      <label for="exampleInputEmail1">イラスト</label>
+      <input type="text" class="form-control" id="illust" placeholder="URL" v-model="illust">
+    </div>
+    <div class="form-group">
+      <button type="submit" class="btn btn-primary" v-on:click="postData">登録</button>
+    </div>
+  </form>
+</script>
+
+<script type="text/x-template" id="add-events">
+  <form>
+    <div class="form-group">
+      <label for="exampleInputFile">イベント定義ファイル</label>
+      <input type="file" class="form-control-file" id="source" aria-describedby="fileHelp">
+      <small id="fileHelp" class="form-text text-muted">CSV形式のファイルをアップロードしてください。サンプルは<a href="https://s3-ap-northeast-1.amazonaws.com/idress.sevenspirals.net/tools/event/example.csv">こちら</a>。</small><br>
+      <small id="fileHelp" class="form-text text-muted"><span style="font-weight:bold;color:red;">注意</span>: 同じ番号の設問を投稿すると上書きされますが、提出内容も同時にリセットされます。</small>
+    </div>
+    <div class="form-group">
+      <label for="exampleInputPassword1">Password</label>
+      <input type="password" class="form-control" id="password" placeholder="Password" v-model="password">
+    </div>
+    <button type="submit" class="btn btn-primary" v-on:click="postData">登録</button>
+  </form>
+</script>
+
+<script src="https://cdn.jsdelivr.net/vue/2.0.3/vue.min.js"></script>
+<script src="https://cdn.jsdelivr.net/vue.router/2.0.1/vue-router.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.8.3/jquery.csv.js"></script>
+<script src="./js/aws-sdk.min.js"></script>
+<script src="./js/main.js"></script>
+</body>
+</html>
